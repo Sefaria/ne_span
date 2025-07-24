@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import cached_property
-from tokenizer import get_tokenizer
+from .tokenizer import get_tokenizer
 
 TOKENIZER = get_tokenizer()
 
