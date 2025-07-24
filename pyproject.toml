@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ne-span"
+version = "0.2.0"
+description = "NESpan and NEDoc"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Sefaria", email = "dev@sefaria.org" }]
+requires-python = ">=3.7"
+dependencies = [
+  "spacy~=3.7.0"
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+]
