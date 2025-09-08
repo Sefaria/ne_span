@@ -1,8 +1,75 @@
 from abc import ABC, abstractmethod
 from functools import cached_property
 from .tokenizer import get_tokenizer
+from enum import Enum
 
 TOKENIZER = get_tokenizer()
+
+# keys correspond named entity labels in the models
+# values are properties in RefPartType
+LABEL_TO_REF_PART_TYPE_ATTR = {
+    # HE
+    "כותרת": 'NAMED',
+    "מספר": "NUMBERED",
+    "דה": "DH",
+    "סימן-טווח": "RANGE_SYMBOL",
+    "לקמן-להלן": "RELATIVE",
+    "שם": "IBID",
+    "לא-רציף": "NON_CTS",
+    # EN
+    "title": 'NAMED',
+    "number": "NUMBERED",
+    "DH": "DH",
+    "range-symbol": "RANGE_SYMBOL",
+    "dir-ibid": "RELATIVE",
+    "ibid": "IBID",
+    "non-cts": "NON_CTS",
+}
+
+
+# keys correspond named entity labels in spacy models
+# values are properties in NamedEntityType
+LABEL_TO_NAMED_ENTITY_TYPE_ATTR = {
+    # HE
+    "מקור": "CITATION",
+    "בן-אדם": "PERSON",
+    "קבוצה": "GROUP",
+    # EN
+    "Person": "PERSON",
+    "Group": "GROUP",
+    "Citation": "CITATION",
+}
+
+
+class NamedEntityType(Enum):
+    PERSON = "person"
+    GROUP = "group"
+    CITATION = "citation"
+
+    @classmethod
+    def span_label_to_enum(cls, span_label: str) -> 'NamedEntityType':
+        """
+        Convert span label from spacy named entity to NamedEntityType
+        """
+        return getattr(cls, LABEL_TO_NAMED_ENTITY_TYPE_ATTR[span_label])
+
+
+class RefPartType(Enum):
+    NAMED = "named"
+    NUMBERED = "numbered"
+    DH = "dibur_hamatchil"
+    RANGE_SYMBOL = "range_symbol"
+    RANGE = "range"
+    RELATIVE = "relative"
+    IBID = "ibid"
+    NON_CTS = "non_cts"
+
+    @classmethod
+    def span_label_to_enum(cls, span_label: str) -> 'RefPartType':
+        """
+        Convert span label from spacy named entity to RefPartType
+        """
+        return getattr(cls, LABEL_TO_REF_PART_TYPE_ATTR[span_label])
 
 
 class _Subspannable(ABC):
