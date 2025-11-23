@@ -88,7 +88,7 @@ class _Subspannable(ABC):
         pass
 
     @abstractmethod
-    def _get_subspan_offset(self) -> int:
+    def _get_subspan_doc(self) -> 'NEDoc':
         pass
 
     def word_length(self) -> int:
@@ -104,10 +104,7 @@ class _Subspannable(ABC):
             end = item.stop
         else:
             raise TypeError("Item must be a slice")
-        start += self._get_subspan_offset()
-        if end is not None:
-            end += self._get_subspan_offset()
-        return NESpan(self.doc, start, end, span_label)
+        return NESpan(self._get_subspan_doc(), start, end, span_label)
 
     @cached_property
     def __word_spans(self):
@@ -147,8 +144,8 @@ class NEDoc(_Subspannable):
     def doc(self):
         return self
 
-    def _get_subspan_offset(self) -> int:
-        return 0
+    def _get_subspan_doc(self) -> 'NEDoc':
+        return self
 
 
 class NESpan(_Subspannable):
@@ -189,8 +186,8 @@ class NESpan(_Subspannable):
     def __hash__(self):
         return hash((self.__doc.text, self.__start, self.__end, self.__label))
 
-    def _get_subspan_offset(self) -> int:
-        return self.__start
+    def _get_subspan_doc(self) -> 'NEDoc':
+        return NEDoc(self.doc.text[self.__start:self.__end])
 
     def serialize(self, with_text=False) -> dict:
         """
