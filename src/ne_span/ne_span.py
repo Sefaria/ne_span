@@ -87,10 +87,6 @@ class _Subspannable(ABC):
     def doc(self) -> 'NEDoc':
         pass
 
-    @abstractmethod
-    def _get_subspan_doc(self) -> 'NEDoc':
-        pass
-
     def word_length(self) -> int:
         """
         Returns the number of words in the text.
@@ -104,7 +100,7 @@ class _Subspannable(ABC):
             end = item.stop
         else:
             raise TypeError("Item must be a slice")
-        return NESpan(self._get_subspan_doc(), start, end, span_label)
+        return NESpan(self, start, end, span_label)
 
     @cached_property
     def __word_spans(self):
@@ -144,15 +140,12 @@ class NEDoc(_Subspannable):
     def doc(self):
         return self
 
-    def _get_subspan_doc(self) -> 'NEDoc':
-        return self
-
 
 class NESpan(_Subspannable):
     """
     Span of text which represents a named entity before it has been identified with an object in Sefaria's DB
     """
-    def __init__(self, doc: NEDoc, start: int, end: int, label: str = None):
+    def __init__(self, doc: _Subspannable, start: int, end: int, label: str = None):
         """
         :param doc: The document containing the text
         :param start: Start index of the span in the text
@@ -168,7 +161,7 @@ class NESpan(_Subspannable):
         return f"NESpan(text='{self.text}', label='{self.label}', range={self.range})"
 
     @property
-    def doc(self) -> NEDoc:
+    def doc(self) -> _Subspannable:
         return self.__doc
 
     @property
@@ -180,14 +173,24 @@ class NESpan(_Subspannable):
         return self.__label
 
     @property
-    def range(self) -> [int, int]:
+    def range(self) -> tuple[int, int]:
         return self.__start, self.__end
+    
+    def get_range_relative_to_doc(self) -> tuple[int, int]:
+        """
+        Get the range of the span relative to the root document.
+        :return: A tuple (start, end) representing the range in the root document.
+        """
+        parent_span = self.doc
+        start, end = self.range
+        while hasattr(parent_span, "range"):
+            start += parent_span.range[0]
+            end += parent_span.range[0]
+            parent_span = parent_span.doc
+        return start, end
 
     def __hash__(self):
         return hash((self.__doc.text, self.__start, self.__end, self.__label))
-
-    def _get_subspan_doc(self) -> 'NEDoc':
-        return NEDoc(self.doc.text[self.__start:self.__end])
 
     def serialize(self, with_text=False) -> dict:
         """
