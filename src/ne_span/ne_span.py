@@ -33,10 +33,10 @@ LABEL_TO_NAMED_ENTITY_TYPE_ATTR = {
     # HE
     "מקור": "CITATION",
     "בן-אדם": "PERSON",
-    "קבוצה": "GROUP",
+    "קבוצה": "PERSON",  # group is mapped to PERSON to maintain backward compatibility
     # EN
     "Person": "PERSON",
-    "Group": "GROUP",
+    "Group": "PERSON",  # group is mapped to PERSON to maintain backward compatibility
     "Citation": "CITATION",
 }
 
