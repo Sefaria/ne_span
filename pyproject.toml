@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ne-span"
-version = "1.0.1"
+version = "1.0.2"
 description = "NESpan and NEDoc"
 readme = "README.md"
 license = { file = "LICENSE" }
